@@ -22,8 +22,7 @@ public class PlayerAttackState : IState<Player>
             if (Time.time >= nextTimeToFire)
             {
                 nextTimeToFire = Time.time + fireRate;
-                character.ChangeAnim(Constant.ANIM_SLASH);
-
+                character.ChangeAnim(Constant.ANIM_ATTACK);
             }
         }
     }

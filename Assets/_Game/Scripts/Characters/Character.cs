@@ -5,24 +5,31 @@ using UnityEngine.UI;
 
 public class Character : MonoBehaviour
 {
-
     [SerializeField] protected NavMeshAgent agent;
+    [SerializeField] protected Transform enemyTarget;
+    [SerializeField] protected bool isDead = false;
+    [SerializeField] protected float nomalAttackDamage;
+    [Header("Animation")]
     [SerializeField] protected string currentAnimName;
     [SerializeField] protected Animator anim;
     [SerializeField] private List<Avatar> listAvatar;
 
 
+
+
+    [Header("Heath UI")]
     [SerializeField] protected float maxHealth;
     [SerializeField] protected float minHealth;
     [SerializeField] protected float health;
     [SerializeField] protected Slider healthBar;
 
-    [SerializeField] protected float normalCoolDownAttack = 2f;
-    public float NormalCoolDownAttack => normalCoolDownAttack;
-    public NavMeshAgent Agent => agent;
 
-    public float rotateSpeedMovement = 0.05f;
     private float rotateVelocity;
+    public float rotateSpeedMovement = 0.05f;
+
+    public NavMeshAgent Agent => agent;
+    public Transform EnemyTarget => enemyTarget;
+    public bool IsDead => isDead;
     private void Awake()
     {
         health = maxHealth;
@@ -41,13 +48,15 @@ public class Character : MonoBehaviour
         agent.stoppingDistance = 0;
         agent.SetDestination(position);
         LookRotation(position);
+        //SetRotation(position);
 
     }
 
     public void MoveTowardTarget(Vector3 position)
     {
         ChangeAnim(Constant.ANIM_RUN);
-        LookRotation(position);
+        //LookRotation(position);
+        SetRotation(position);
         agent.stoppingDistance = 2f;
         agent.SetDestination(position);
     }
@@ -83,6 +92,11 @@ public class Character : MonoBehaviour
         float rotationY = Mathf.SmoothDampAngle(transform.eulerAngles.y, rotationToLookAt.eulerAngles.y, ref rotateVelocity, rotateSpeedMovement * (Time.deltaTime * 5));
 
         transform.eulerAngles = new Vector3(0, rotationY, 0);
+    }
+    public void SetRotation(Vector3 lookAtPosition)
+    {
+        Vector3 directon = (lookAtPosition - transform.position).normalized;
+        transform.rotation = Quaternion.LookRotation(directon);
     }
 
     public void TakeDamage(float damage)
