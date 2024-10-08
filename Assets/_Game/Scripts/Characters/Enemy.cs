@@ -99,12 +99,8 @@ public class Enemy : Character
 
     }
 
-    private void OnDrawGizmos()
+    public void DestroyEvent()
     {
-        Gizmos.color = Color.white;
-        Gizmos.DrawWireSphere(mapTransform.position, radiusMap);
-
-        Gizmos.DrawWireSphere(transform.position, radiusEnemy);
+        Destroy(gameObject, 2f);
     }
-
 }

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerAttackState : IState<Player>
@@ -23,6 +21,20 @@ public class PlayerAttackState : IState<Player>
             {
                 nextTimeToFire = Time.time + fireRate;
                 character.ChangeAnim(Constant.ANIM_ATTACK);
+            }
+        }
+
+        if (character.EnemyTarget == null)
+        {
+            if (character.IsMobileMode == true)
+            {
+                character.ChangeState(new PlayerNullState());
+                character.isAttack = false;
+            }
+            else
+            {
+
+                character.ChangeState(new PlayerIdleState());
             }
         }
     }

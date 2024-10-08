@@ -23,5 +23,6 @@ public class Constant
     public const string ANIM_ATTACK = "Attack";
     public const string ANIM_SKILL_1 = "Skill_1";
     public const string ANIM_SKILL_2 = "Skill_2";
+    public const string ANIM_SKILL_3 = "Skill_3";
     public const string ANIM_DEAD = "Dead";
 }

@@ -102,6 +102,19 @@ public class Character : MonoBehaviour
     public void TakeDamage(float damage)
     {
         health -= damage;
+        if (health <= 0)
+        {
+            health = 0;
+        }
+        healthBar.value = health;
+    }
+    public void Healing(float hp)
+    {
+        health += hp;
+        if (health >= 100)
+        {
+            health = 100;
+        }
         healthBar.value = health;
     }
     public bool IsFinishMove()

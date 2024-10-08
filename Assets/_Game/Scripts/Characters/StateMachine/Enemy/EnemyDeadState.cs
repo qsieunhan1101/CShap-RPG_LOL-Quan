@@ -9,6 +9,7 @@ public class EnemyDeadState : IState<Enemy>
         character.StopMove();
         character.ChangeAnim(Constant.ANIM_DEAD);
         character.gameObject.tag = Constant.TAG_UNTAGGED;
+        character.DestroyEvent();
     }
 
     public void OnExecute(Enemy character)

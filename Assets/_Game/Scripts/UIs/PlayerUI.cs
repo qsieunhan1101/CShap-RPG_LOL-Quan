@@ -1,5 +1,4 @@
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,8 +14,7 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] private bool isSkill_1_CoolDown = false;
     [SerializeField] private float skill_1_MaxCoolDown;
     [SerializeField] private float skill_1_CoolDownTime;
-    private Vector3 posSkill_1;
-
+    
     [Header("Skill 2")]
     [SerializeField] private Canvas skill_2_Canvas;
     [SerializeField] private Image skill_2_Image;
@@ -26,8 +24,25 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] private float skill_2_MaxCoolDown;
     [SerializeField] private float skill_2_CoolDownTime;
 
+    [Header("Skill 3")]
+    [SerializeField] private Canvas skill_3_Canvas;
+    [SerializeField] private Image skill_3_Image;
+    [SerializeField] private Image skill_3_Selection;
+    [SerializeField] private TextMeshProUGUI skill_3_TextCoolDown;
+    [SerializeField] private bool isSkill_3_UIActive;
+    [SerializeField] private bool isSkill_3_CoolDown = false;
+    [SerializeField] private float skill_3_MaxCoolDown;
+    [SerializeField] private float skill_3_CoolDownTime;
+    [SerializeField] private float skill_3_MaxDistance;
+    private Vector3 skill_3_Pos;
+    private Vector3 positionSkill;
+    private RaycastHit hit;
     public bool IsSkill_1_UIActive => isSkill_1_UIActive;
-    public Vector3 PosSkill_1 => posSkill_1;
+    public Vector3 PositionSkill => positionSkill;
+    public Vector3 Skill_3_Pos => skill_3_Pos;
+
+
+
 
     private void Start()
     {
@@ -41,20 +56,48 @@ public class PlayerUI : MonoBehaviour
         isSkill_2_CoolDown = false;
         skill_2_Image.fillAmount = 0;
         skill_2_TextCoolDown.gameObject.SetActive(false);
+
+        Skill_3_UIDeactive();
+        isSkill_3_CoolDown = false;
+        skill_3_Image.fillAmount = 0;
+        skill_3_TextCoolDown.gameObject.SetActive(false);
     }
 
     private void Update()
     {
 
-        //Skill_1_CoolDownUI();
         Skill_1_UI();
-
-        Skill_CoolDownUI(ref isSkill_1_CoolDown,ref skill_1_CoolDownTime, skill_1_MaxCoolDown, skill_1_Image, skill_1_TextCoolDown);
+        Skill_CoolDownUI(ref isSkill_1_CoolDown, ref skill_1_CoolDownTime, skill_1_MaxCoolDown, skill_1_Image, skill_1_TextCoolDown);
 
 
         Skill_2_UI();
         Skill_CoolDownUI(ref isSkill_2_CoolDown, ref skill_2_CoolDownTime, skill_2_MaxCoolDown, skill_2_Image, skill_2_TextCoolDown);
 
+        Skill_3_UI();
+        Skill_CoolDownUI(ref isSkill_3_CoolDown, ref skill_3_CoolDownTime, skill_3_MaxCoolDown, skill_3_Image, skill_3_TextCoolDown);
+
+        if (player.IsMobileMode == true)
+        {
+
+        }
+
+    }
+    private void Skill_CoolDownUI(ref bool isSkill_CoolDown, ref float skill_CoolDownTime, float skill_MaxCoolDown, Image skill_Image, TextMeshProUGUI skill_TextCoolDown)
+    {
+        if (isSkill_CoolDown == true)
+        {
+            skill_CoolDownTime -= Time.deltaTime;
+            skill_Image.fillAmount = skill_CoolDownTime / skill_MaxCoolDown;
+            skill_TextCoolDown.text = (Mathf.Floor(skill_CoolDownTime * 10) / 10).ToString();
+
+            if (skill_CoolDownTime <= 0)
+            {
+                skill_CoolDownTime = 0;
+                skill_Image.fillAmount = 0;
+                skill_TextCoolDown.gameObject.SetActive(false);
+                isSkill_CoolDown = false;
+            }
+        }
     }
 
     public void Skill_1_UI()
@@ -63,20 +106,22 @@ public class PlayerUI : MonoBehaviour
         {
             return;
         }
-        if (Input.GetKeyDown(KeyCode.Q) && isSkill_1_UIActive == false)
+        if (Input.GetKeyDown(KeyCode.Q) && isSkill_1_UIActive == false && player.CheckSkillCast() == false)
         {
             skill_1_Canvas.gameObject.SetActive(true);
             isSkill_1_UIActive = true;
+            Skill_2_UIDeactive();
+            Skill_3_UIDeactive();
         }
         if (isSkill_1_UIActive == true)
         {
-            RaycastHit hit;
+
             if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, groundLayerMask))
             {
-                posSkill_1 = new Vector3(hit.point.x, hit.point.y, hit.point.z);
+                positionSkill = new Vector3(hit.point.x, hit.point.y, hit.point.z);
 
             }
-            Quaternion qua = Quaternion.LookRotation(posSkill_1 - transform.position);
+            Quaternion qua = Quaternion.LookRotation(positionSkill - transform.position);
 
             qua.eulerAngles = new Vector3(0, qua.eulerAngles.y, qua.eulerAngles.z);
 
@@ -92,7 +137,7 @@ public class PlayerUI : MonoBehaviour
                 skill_1_CoolDownTime = skill_1_MaxCoolDown;
                 skill_1_TextCoolDown.gameObject.SetActive(true);
                 skill_1_TextCoolDown.text = skill_1_MaxCoolDown.ToString();
-                
+
             }
         }
     }
@@ -102,10 +147,12 @@ public class PlayerUI : MonoBehaviour
         {
             return;
         }
-        if (Input.GetKeyDown(KeyCode.W) && isSkill_2_UIActive == false)
+        if (Input.GetKeyDown(KeyCode.W) && isSkill_2_UIActive == false && player.CheckSkillCast() == false)
         {
             skill_2_Canvas.gameObject.SetActive(true);
             isSkill_2_UIActive = true;
+            Skill_1_UIDeactive();
+            Skill_3_UIDeactive();
         }
         if (isSkill_2_UIActive == true)
         {
@@ -124,38 +171,44 @@ public class PlayerUI : MonoBehaviour
             }
         }
     }
-    private void Skill_1_CoolDownUI()
-    {
-        if (isSkill_1_CoolDown == true)
-        {
-            skill_1_CoolDownTime -= Time.deltaTime;
-            skill_1_Image.fillAmount = skill_1_CoolDownTime / skill_1_MaxCoolDown;
-            skill_1_TextCoolDown.text = Mathf.Floor(skill_1_CoolDownTime).ToString();
 
-            if (skill_1_CoolDownTime <= 0)
-            {
-                skill_1_CoolDownTime = 0;
-                skill_1_Image.fillAmount = 0;
-                skill_1_TextCoolDown.gameObject.SetActive(false);
-                isSkill_1_CoolDown = false;
-            }
+    public void Skill_3_UI()
+    {
+        if (isSkill_3_CoolDown == true)
+        {
+            return;
         }
-    }
-
-    private void Skill_CoolDownUI(ref bool isSkill_CoolDown, ref float skill_CoolDownTime, float skill_MaxCoolDown, Image skill_Image, TextMeshProUGUI skill_TextCoolDown)
-    {
-        if (isSkill_CoolDown == true)
+        if (Input.GetKeyDown(KeyCode.E) && isSkill_3_UIActive == false && player.CheckSkillCast() == false)
         {
-            skill_CoolDownTime -= Time.deltaTime;
-            skill_Image.fillAmount = skill_CoolDownTime / skill_MaxCoolDown;
-            skill_TextCoolDown.text = (Mathf.Floor(skill_CoolDownTime*10)/10).ToString();
-
-            if(skill_CoolDownTime <= 0)
+            skill_3_Canvas.gameObject.SetActive(true);
+            isSkill_3_UIActive = true;
+            Skill_1_UIDeactive();
+            Skill_2_UIDeactive();
+        }
+        if (isSkill_3_UIActive == true)
+        {
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, groundLayerMask))
             {
-                skill_CoolDownTime = 0;
-                skill_Image.fillAmount = 0;
-                skill_TextCoolDown.gameObject.SetActive(false);
-                isSkill_CoolDown = false;
+                positionSkill = new Vector3(hit.point.x, skill_3_Selection.transform.position.y, hit.point.z);
+            }
+
+            Vector3 hitPosDir = (positionSkill - transform.position).normalized;
+            float distance = Vector3.Distance(positionSkill, transform.position);
+            distance = Mathf.Min(distance, skill_3_MaxDistance);
+
+            skill_3_Pos = transform.position + hitPosDir * distance;
+            skill_3_Selection.transform.position = skill_3_Pos;
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                Skill_3_UIDeactive();
+                player.ChangeState(new PlayerSkill_3_State());
+                player.isSkill_3_Casting = true;
+                isSkill_3_CoolDown = true;
+                skill_3_Image.fillAmount = 1;
+                skill_3_CoolDownTime = skill_3_MaxCoolDown;
+                skill_3_TextCoolDown.gameObject.SetActive(true);
+                skill_3_TextCoolDown.text = skill_3_MaxCoolDown.ToString();
             }
         }
     }
@@ -170,4 +223,11 @@ public class PlayerUI : MonoBehaviour
         skill_2_Canvas.gameObject.SetActive(false);
         isSkill_2_UIActive = false;
     }
+
+    public void Skill_3_UIDeactive()
+    {
+        skill_3_Canvas.gameObject.SetActive(false);
+        isSkill_3_UIActive = false;
+    }
+
 }
