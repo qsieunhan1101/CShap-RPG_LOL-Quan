@@ -51,6 +51,7 @@ public class Player : Character
     [SerializeField] private float nomalAttackMobileRadius;
     [SerializeField] private Button btnAttack;
     [SerializeField] private Collider[] mobileEnemyColliders;
+    [SerializeField] private JoystickCheckInput joystickCheckInput;
 
     public bool isAttack = false;
 
@@ -110,7 +111,9 @@ public class Player : Character
         if (isMobileMode == true)
         {
 
+
             MoveByJoystick();
+
         }
 
     }
@@ -193,7 +196,21 @@ public class Player : Character
     {
         StopMove();
         //transform.rotation = Quaternion.LookRotation((playerUI.posSkill_1 - transform.position).normalized);
-        SetRotation(playerUI.PositionSkill);
+
+        if (isMobileMode == true)
+        {
+            Vector3 dir = (transform.position + playerUI.PositionSkill);
+            SetRotation(dir);
+
+        }
+        else
+        {
+            SetRotation(playerUI.PositionSkill);
+
+        }
+
+
+        Debug.Log("Look " + playerUI.PositionSkill);
         ChangeAnim(Constant.ANIM_SKILL_1);
         skill_1_Particle.Play();
     }
@@ -291,13 +308,13 @@ public class Player : Character
     {
         if (isMoving == false)
         {
-            if (isAttack == false)
-            {
 
+            if (isAttack == false && CheckSkillCast() == false)
+            {
                 ChangeAnim(Constant.ANIM_IDLE);
             }
         }
-        else
+        else if (isMoving == true)
         {
             ChangeAnim(Constant.ANIM_RUN);
             rb.velocity = new Vector3(joystick_Move.Horizontal * speed, rb.velocity.y, joystick_Move.Vertical * speed);
@@ -305,22 +322,24 @@ public class Player : Character
             ChangeState(new PlayerNullState());
             isAttack = false;
         }
-        PlayerJoystickRotation();
+        if (CheckSkillCast() == false)
+        {
+            PlayerJoystickRotation();
+        }
     }
 
     private void PlayerJoystickRotation()
     {
-        if (Input.touchCount > 0)
+        if (joystickCheckInput.isTouching == true)
         {
-            if (RectTransformUtility.RectangleContainsScreenPoint(joystick_Move.GetComponent<RectTransform>(), Input.GetTouch(0).position))
-            {
-                moveDirection = new Vector3(joystick_Move.Horizontal, 0, joystick_Move.Vertical);
-                isMoving = true;
 
-                transform.rotation = Quaternion.LookRotation(moveDirection);
-            }
+            moveDirection = new Vector3(joystick_Move.Horizontal, 0, joystick_Move.Vertical);
+            isMoving = true;
+
+            transform.rotation = Quaternion.LookRotation(moveDirection);
+
         }
-        else
+        else if (joystickCheckInput.isTouching == false)
         {
             isMoving = false;
         }
@@ -364,6 +383,7 @@ public class Player : Character
         }
         return false;
     }
+
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;

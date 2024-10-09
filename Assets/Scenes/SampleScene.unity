@@ -3239,13 +3239,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1936112774589185994, guid: 8c25c73346dd22d48ac285383b505e19, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2215228828774429079, guid: 8c25c73346dd22d48ac285383b505e19, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4787426726637093880, guid: 8c25c73346dd22d48ac285383b505e19, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6023825991160147779, guid: 8c25c73346dd22d48ac285383b505e19, type: 3}
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 6749248341217328858, guid: 8c25c73346dd22d48ac285383b505e19, type: 3}
       propertyPath: isMobileMode
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8752308376727048957, guid: 8c25c73346dd22d48ac285383b505e19, type: 3}
       propertyPath: m_AnchorMax.x

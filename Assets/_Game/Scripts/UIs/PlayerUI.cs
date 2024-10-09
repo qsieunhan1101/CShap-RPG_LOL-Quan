@@ -14,7 +14,7 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] private bool isSkill_1_CoolDown = false;
     [SerializeField] private float skill_1_MaxCoolDown;
     [SerializeField] private float skill_1_CoolDownTime;
-    
+
     [Header("Skill 2")]
     [SerializeField] private Canvas skill_2_Canvas;
     [SerializeField] private Image skill_2_Image;
@@ -41,23 +41,24 @@ public class PlayerUI : MonoBehaviour
     public Vector3 PositionSkill => positionSkill;
     public Vector3 Skill_3_Pos => skill_3_Pos;
 
-
+    [Header("MobileMode")]
+    [SerializeField] private FixedJoystick joystick_Skill_1;
 
 
     private void Start()
     {
-        Skill_1_UIDeactive();
+        Skill_1_UIActive(false);
         isSkill_1_CoolDown = false;
         skill_1_Image.fillAmount = 0;
         skill_1_TextCoolDown.gameObject.SetActive(false);
 
 
-        Skill_2_UIDeactive();
+        Skill_2_UIActive(false);
         isSkill_2_CoolDown = false;
         skill_2_Image.fillAmount = 0;
         skill_2_TextCoolDown.gameObject.SetActive(false);
 
-        Skill_3_UIDeactive();
+        Skill_3_UIActive(false);
         isSkill_3_CoolDown = false;
         skill_3_Image.fillAmount = 0;
         skill_3_TextCoolDown.gameObject.SetActive(false);
@@ -65,20 +66,23 @@ public class PlayerUI : MonoBehaviour
 
     private void Update()
     {
-
-        Skill_1_UI();
-        Skill_CoolDownUI(ref isSkill_1_CoolDown, ref skill_1_CoolDownTime, skill_1_MaxCoolDown, skill_1_Image, skill_1_TextCoolDown);
-
-
-        Skill_2_UI();
-        Skill_CoolDownUI(ref isSkill_2_CoolDown, ref skill_2_CoolDownTime, skill_2_MaxCoolDown, skill_2_Image, skill_2_TextCoolDown);
-
-        Skill_3_UI();
-        Skill_CoolDownUI(ref isSkill_3_CoolDown, ref skill_3_CoolDownTime, skill_3_MaxCoolDown, skill_3_Image, skill_3_TextCoolDown);
-
-        if (player.IsMobileMode == true)
+        if (player.IsMobileMode == false)
         {
 
+            Skill_1_UI();
+
+
+            Skill_2_UI();
+
+            Skill_3_UI();
+
+        }
+        Skill_CoolDownUI(ref isSkill_1_CoolDown, ref skill_1_CoolDownTime, skill_1_MaxCoolDown, skill_1_Image, skill_1_TextCoolDown);
+        Skill_CoolDownUI(ref isSkill_2_CoolDown, ref skill_2_CoolDownTime, skill_2_MaxCoolDown, skill_2_Image, skill_2_TextCoolDown);
+        Skill_CoolDownUI(ref isSkill_3_CoolDown, ref skill_3_CoolDownTime, skill_3_MaxCoolDown, skill_3_Image, skill_3_TextCoolDown);
+        if (player.IsMobileMode == true)
+        {
+            Skill_1_UIMobile();
         }
 
     }
@@ -108,10 +112,9 @@ public class PlayerUI : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Q) && isSkill_1_UIActive == false && player.CheckSkillCast() == false)
         {
-            skill_1_Canvas.gameObject.SetActive(true);
-            isSkill_1_UIActive = true;
-            Skill_2_UIDeactive();
-            Skill_3_UIDeactive();
+            Skill_1_UIActive(true);
+            Skill_2_UIActive(false);
+            Skill_3_UIActive(false);
         }
         if (isSkill_1_UIActive == true)
         {
@@ -129,7 +132,7 @@ public class PlayerUI : MonoBehaviour
 
             if (Input.GetMouseButtonDown(0))
             {
-                Skill_1_UIDeactive();
+                Skill_1_UIActive(false);
                 player.ChangeState(new PlayerSkill_1_State());
                 player.isSkill_1_Casting = true;
                 isSkill_1_CoolDown = true;
@@ -149,17 +152,16 @@ public class PlayerUI : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.W) && isSkill_2_UIActive == false && player.CheckSkillCast() == false)
         {
-            skill_2_Canvas.gameObject.SetActive(true);
-            isSkill_2_UIActive = true;
-            Skill_1_UIDeactive();
-            Skill_3_UIDeactive();
+            Skill_2_UIActive(true);
+            Skill_1_UIActive(false);
+            Skill_3_UIActive(false);
         }
         if (isSkill_2_UIActive == true)
         {
 
             if (Input.GetMouseButtonDown(0))
             {
-                Skill_2_UIDeactive();
+                Skill_2_UIActive(false);
                 player.ChangeState(new PlayerSkill_2_State());
                 player.isSkill_2_Casting = true;
                 isSkill_2_CoolDown = true;
@@ -180,10 +182,9 @@ public class PlayerUI : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.E) && isSkill_3_UIActive == false && player.CheckSkillCast() == false)
         {
-            skill_3_Canvas.gameObject.SetActive(true);
-            isSkill_3_UIActive = true;
-            Skill_1_UIDeactive();
-            Skill_2_UIDeactive();
+            Skill_3_UIActive(true);
+            Skill_1_UIActive(false);
+            Skill_2_UIActive(false);
         }
         if (isSkill_3_UIActive == true)
         {
@@ -201,7 +202,7 @@ public class PlayerUI : MonoBehaviour
 
             if (Input.GetMouseButtonDown(0))
             {
-                Skill_3_UIDeactive();
+                Skill_3_UIActive(false);
                 player.ChangeState(new PlayerSkill_3_State());
                 player.isSkill_3_Casting = true;
                 isSkill_3_CoolDown = true;
@@ -213,21 +214,87 @@ public class PlayerUI : MonoBehaviour
         }
     }
 
-    public void Skill_1_UIDeactive()
+    public void Skill_1_UIActive(bool isActive)
     {
-        skill_1_Canvas.gameObject.SetActive(false);
-        isSkill_1_UIActive = false;
+        if (isActive == true)
+        {
+            skill_1_Canvas.gameObject.SetActive(true);
+            isSkill_1_UIActive = true;
+        }
+        else
+        {
+            skill_1_Canvas.gameObject.SetActive(false);
+            isSkill_1_UIActive = false;
+
+        }
     }
-    public void Skill_2_UIDeactive()
+    public void Skill_2_UIActive(bool isActive)
     {
-        skill_2_Canvas.gameObject.SetActive(false);
-        isSkill_2_UIActive = false;
+        if (isActive == true)
+        {
+            skill_2_Canvas.gameObject.SetActive(true);
+            isSkill_2_UIActive = true;
+        }
+        else
+        {
+            skill_2_Canvas.gameObject.SetActive(false);
+            isSkill_2_UIActive = false;
+        }
+    }
+    public void Skill_3_UIActive(bool isActive)
+    {
+        if (isActive == true)
+        {
+            skill_3_Canvas.gameObject.SetActive(true);
+            isSkill_3_UIActive = true;
+        }
+        else
+        {
+            skill_3_Canvas.gameObject.SetActive(false);
+            isSkill_3_UIActive = false;
+        }
+
     }
 
-    public void Skill_3_UIDeactive()
+    /// <summary>
+    /// ////////////////////////
+    /// </summary>
+    private void Skill_1_UIMobile()
     {
-        skill_3_Canvas.gameObject.SetActive(false);
-        isSkill_3_UIActive = false;
-    }
+        if (isSkill_1_CoolDown == true)
+        {
+            return;
+        }
+        if (joystick_Skill_1.GetComponent<JoystickCheckInput>().isTouching == true && isSkill_1_UIActive == false && player.CheckSkillCast() == false)
+        {
+            Skill_1_UIActive(true);
+            Skill_2_UIActive(false);
+            Skill_3_UIActive(false);
+        }
+        if (isSkill_1_UIActive == true)
+        {
+            positionSkill = new Vector3(joystick_Skill_1.Horizontal, 0, joystick_Skill_1.Vertical).normalized;
 
+
+            Quaternion qua = Quaternion.LookRotation(positionSkill - skill_1_Canvas.transform.localPosition);
+
+            qua.eulerAngles = new Vector3(0, qua.eulerAngles.y, qua.eulerAngles.z);
+
+            skill_1_Canvas.transform.rotation = Quaternion.Lerp(qua, skill_1_Canvas.transform.rotation, 0);
+
+            if (joystick_Skill_1.GetComponent<JoystickCheckInput>().isTouching == false)
+            {
+                positionSkill = joystick_Skill_1.GetComponent<JoystickCheckInput>().dir;
+                Skill_1_UIActive(false);
+                player.ChangeState(new PlayerSkill_1_State());
+                player.isSkill_1_Casting = true;
+                isSkill_1_CoolDown = true;
+                skill_1_Image.fillAmount = 1;
+                skill_1_CoolDownTime = skill_1_MaxCoolDown;
+                skill_1_TextCoolDown.gameObject.SetActive(true);
+                skill_1_TextCoolDown.text = skill_1_MaxCoolDown.ToString();
+
+            }
+        }
+    }
 }

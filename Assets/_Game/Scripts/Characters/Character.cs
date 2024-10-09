@@ -97,6 +97,8 @@ public class Character : MonoBehaviour
     {
         Vector3 directon = (lookAtPosition - transform.position).normalized;
         transform.rotation = Quaternion.LookRotation(directon);
+        Debug.Log("Look " + lookAtPosition);
+
     }
 
     public void TakeDamage(float damage)
