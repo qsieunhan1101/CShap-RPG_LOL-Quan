@@ -8,7 +8,7 @@ public class PlayerSkill_1_State : IState<Player>
     public void OnEnter(Player character)
     {
         time = 0;
-        delayStateTime = 2.0f;
+        delayStateTime = 0.5f;
         character.Skill_1_Cast();
     }
 
@@ -22,7 +22,7 @@ public class PlayerSkill_1_State : IState<Player>
                 if (character.IsMobileMode == true)
                 {
                     character.ChangeState(new PlayerNullState());
-
+                    character.ResetAttack();
                 }
                 else
                 {

@@ -9,7 +9,7 @@ public class PlayerSkill_3_State : IState<Player>
     public void OnEnter(Player character)
     {
         time = 0;
-        delayStateTime = 1.0f;
+        delayStateTime = 0.5f;
         character.Skill_3_Cast();
     }
 
@@ -20,7 +20,15 @@ public class PlayerSkill_3_State : IState<Player>
             time += Time.deltaTime;
             if (time >= delayStateTime)
             {
-                character.ChangeState(new PlayerIdleState());
+                if (character.IsMobileMode == true)
+                {
+                    character.ChangeState(new PlayerNullState());
+                    character.ResetAttack();
+                }
+                else
+                {
+                    character.ChangeState(new PlayerIdleState());
+                }
             }
         }
     }

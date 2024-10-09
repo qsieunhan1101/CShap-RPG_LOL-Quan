@@ -15,13 +15,12 @@ public class JoystickCheckInput : MonoBehaviour, IPointerDownHandler, IPointerUp
         if (isTouching == true)
         {
             FixedJoystick joy = GetComponent<FixedJoystick>();
-            dir = new Vector3(joy.Horizontal, 0, joy.Vertical).normalized;
+            dir = new Vector3(joy.Horizontal, 0, joy.Vertical);
         }
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
         isTouching = false;
-        Debug.Log("Dirr "+dir);
     }
 }

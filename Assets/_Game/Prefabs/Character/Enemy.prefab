@@ -130,7 +130,7 @@ MonoBehaviour:
   agent: {fileID: 4159308619227982488}
   enemyTarget: {fileID: 0}
   isDead: 0
-  nomalAttackDamage: 0
+  nomalAttackDamage: 5
   currentAnimName: 
   anim: {fileID: 3949250624376078864}
   listAvatar:

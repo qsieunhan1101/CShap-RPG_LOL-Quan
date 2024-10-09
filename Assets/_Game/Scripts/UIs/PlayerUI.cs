@@ -6,6 +6,8 @@ public class PlayerUI : MonoBehaviour
 {
     [SerializeField] private LayerMask groundLayerMask;
     [SerializeField] private Player player;
+    [SerializeField] private GameObject WebUI;
+    [SerializeField] private GameObject MobileUI;
     [Header("Skill 1")]
     [SerializeField] private Canvas skill_1_Canvas;
     [SerializeField] private Image skill_1_Image;
@@ -43,46 +45,80 @@ public class PlayerUI : MonoBehaviour
 
     [Header("MobileMode")]
     [SerializeField] private FixedJoystick joystick_Skill_1;
-
+    [SerializeField] private FixedJoystick joystick_Skill_2;
+    [SerializeField] private FixedJoystick joystick_Skill_3;
+    //Skill_1_UI_Mobile
+    [SerializeField] private Image skill_1_Image_Mobile;
+    [SerializeField] private TextMeshProUGUI skill_1_TextCoolDown_Mobile;
+    //Skill_2_UI_Mobile
+    [SerializeField] private Image skill_2_Image_Mobile;
+    [SerializeField] private TextMeshProUGUI skill_2_TextCoolDown_Mobile;
+    //Skill_3_UI_Mobile
+    [SerializeField] private Image skill_3_Image_Mobile;
+    [SerializeField] private TextMeshProUGUI skill_3_TextCoolDown_Mobile;
 
     private void Start()
     {
-        Skill_1_UIActive(false);
-        isSkill_1_CoolDown = false;
-        skill_1_Image.fillAmount = 0;
-        skill_1_TextCoolDown.gameObject.SetActive(false);
+        if (player.IsMobileMode == false)
+        {
+            WebUI.SetActive(true);  
+            MobileUI.SetActive(false);
+
+            skill_1_Image.fillAmount = 0;
+            skill_1_TextCoolDown.gameObject.SetActive(false);
 
 
-        Skill_2_UIActive(false);
-        isSkill_2_CoolDown = false;
-        skill_2_Image.fillAmount = 0;
-        skill_2_TextCoolDown.gameObject.SetActive(false);
+            skill_2_Image.fillAmount = 0;
+            skill_2_TextCoolDown.gameObject.SetActive(false);
 
-        Skill_3_UIActive(false);
-        isSkill_3_CoolDown = false;
-        skill_3_Image.fillAmount = 0;
-        skill_3_TextCoolDown.gameObject.SetActive(false);
+            skill_3_Image.fillAmount = 0;
+            skill_3_TextCoolDown.gameObject.SetActive(false);
+        }
+            isSkill_1_CoolDown = false;
+            isSkill_2_CoolDown = false;
+            isSkill_3_CoolDown = false;
+
+            Skill_1_UIActive(false);
+            Skill_2_UIActive(false);
+            Skill_3_UIActive(false);
+
+        if (player.IsMobileMode == true)
+        {
+            WebUI.SetActive(false);
+            MobileUI.SetActive(true);
+
+
+            skill_1_Image_Mobile.fillAmount = 0;
+            skill_2_Image_Mobile.fillAmount = 0;
+            skill_3_Image_Mobile.fillAmount = 0;
+            skill_1_TextCoolDown_Mobile.gameObject.SetActive(false);
+            skill_2_TextCoolDown_Mobile.gameObject.SetActive(false);
+            skill_3_TextCoolDown_Mobile.gameObject.SetActive(false);
+
+        }
     }
 
     private void Update()
     {
         if (player.IsMobileMode == false)
         {
-
             Skill_1_UI();
-
-
             Skill_2_UI();
-
             Skill_3_UI();
-
+            Skill_CoolDownUI(ref isSkill_1_CoolDown, ref skill_1_CoolDownTime, skill_1_MaxCoolDown, skill_1_Image, skill_1_TextCoolDown);
+            Skill_CoolDownUI(ref isSkill_2_CoolDown, ref skill_2_CoolDownTime, skill_2_MaxCoolDown, skill_2_Image, skill_2_TextCoolDown);
+            Skill_CoolDownUI(ref isSkill_3_CoolDown, ref skill_3_CoolDownTime, skill_3_MaxCoolDown, skill_3_Image, skill_3_TextCoolDown);
         }
-        Skill_CoolDownUI(ref isSkill_1_CoolDown, ref skill_1_CoolDownTime, skill_1_MaxCoolDown, skill_1_Image, skill_1_TextCoolDown);
-        Skill_CoolDownUI(ref isSkill_2_CoolDown, ref skill_2_CoolDownTime, skill_2_MaxCoolDown, skill_2_Image, skill_2_TextCoolDown);
-        Skill_CoolDownUI(ref isSkill_3_CoolDown, ref skill_3_CoolDownTime, skill_3_MaxCoolDown, skill_3_Image, skill_3_TextCoolDown);
         if (player.IsMobileMode == true)
         {
             Skill_1_UIMobile();
+            Skill_CoolDownUI(ref isSkill_1_CoolDown, ref skill_1_CoolDownTime, skill_1_MaxCoolDown, skill_1_Image_Mobile, skill_1_TextCoolDown_Mobile);
+
+            Skill_2_UIMobile();
+            Skill_CoolDownUI(ref isSkill_2_CoolDown, ref skill_2_CoolDownTime, skill_2_MaxCoolDown, skill_2_Image_Mobile, skill_2_TextCoolDown_Mobile);
+
+            Skill_3_UIMobile();
+            Skill_CoolDownUI(ref isSkill_3_CoolDown, ref skill_3_CoolDownTime, skill_3_MaxCoolDown, skill_3_Image_Mobile, skill_3_TextCoolDown_Mobile);
         }
 
     }
@@ -94,12 +130,13 @@ public class PlayerUI : MonoBehaviour
             skill_Image.fillAmount = skill_CoolDownTime / skill_MaxCoolDown;
             skill_TextCoolDown.text = (Mathf.Floor(skill_CoolDownTime * 10) / 10).ToString();
 
-            if (skill_CoolDownTime <= 0)
+            if (skill_CoolDownTime <= 0f)
             {
+                isSkill_CoolDown = false;
                 skill_CoolDownTime = 0;
                 skill_Image.fillAmount = 0;
                 skill_TextCoolDown.gameObject.SetActive(false);
-                isSkill_CoolDown = false;
+
             }
         }
     }
@@ -289,11 +326,83 @@ public class PlayerUI : MonoBehaviour
                 player.ChangeState(new PlayerSkill_1_State());
                 player.isSkill_1_Casting = true;
                 isSkill_1_CoolDown = true;
-                skill_1_Image.fillAmount = 1;
+                skill_1_Image_Mobile.fillAmount = 1;
                 skill_1_CoolDownTime = skill_1_MaxCoolDown;
-                skill_1_TextCoolDown.gameObject.SetActive(true);
-                skill_1_TextCoolDown.text = skill_1_MaxCoolDown.ToString();
+                skill_1_TextCoolDown_Mobile.gameObject.SetActive(true);
+                skill_1_TextCoolDown_Mobile.text = skill_1_MaxCoolDown.ToString();
 
+            }
+        }
+    }
+    private void Skill_2_UIMobile()
+    {
+        if (isSkill_2_CoolDown == true)
+        {
+            return;
+        }
+        if (joystick_Skill_2.GetComponent<JoystickCheckInput>().isTouching == true && isSkill_2_UIActive == false && player.CheckSkillCast() == false)
+        {
+            Skill_1_UIActive(false);
+            Skill_2_UIActive(true);
+            Skill_3_UIActive(false);
+        }
+        if (isSkill_2_UIActive == true)
+        {
+            if (joystick_Skill_2.GetComponent<JoystickCheckInput>().isTouching == false)
+            {
+                Skill_2_UIActive(false);
+                player.ChangeState(new PlayerSkill_2_State());
+                player.isSkill_2_Casting = true;
+                isSkill_2_CoolDown = true;
+                skill_2_Image_Mobile.fillAmount = 1;
+                skill_2_CoolDownTime = skill_2_MaxCoolDown;
+                skill_2_TextCoolDown_Mobile.gameObject.SetActive(true);
+                skill_2_TextCoolDown_Mobile.text = skill_2_MaxCoolDown.ToString();
+            }
+        }
+    }
+
+    private void Skill_3_UIMobile()
+    {
+        if (isSkill_3_CoolDown == true)
+        {
+            return;
+        }
+        if (joystick_Skill_3.GetComponent<JoystickCheckInput>().isTouching == true && isSkill_3_UIActive == false && player.CheckSkillCast() == false)
+        {
+            Skill_1_UIActive(false);
+            Skill_2_UIActive(false);
+            Skill_3_UIActive(true);
+        }
+        if (isSkill_3_UIActive == true)
+        {
+
+            positionSkill = new Vector3(joystick_Skill_3.Horizontal, 0, joystick_Skill_3.Vertical);
+
+
+            float X_Percent = Mathf.InverseLerp(-1, 1, positionSkill.x);
+            float Z_Percent = Mathf.InverseLerp(-1, 1, positionSkill.z);
+            float X = Mathf.Lerp(-skill_3_MaxDistance, skill_3_MaxDistance, X_Percent);
+            float Z = Mathf.Lerp(-skill_3_MaxDistance, skill_3_MaxDistance, Z_Percent);
+            skill_3_Pos = new Vector3(X, 0, Z) + skill_3_Canvas.transform.position;
+            skill_3_Selection.transform.position = skill_3_Pos;
+
+            if (joystick_Skill_3.GetComponent<JoystickCheckInput>().isTouching == false)
+            {
+                X_Percent = Mathf.InverseLerp(-1, 1, joystick_Skill_3.GetComponent<JoystickCheckInput>().dir.x);
+                Z_Percent = Mathf.InverseLerp(-1, 1, joystick_Skill_3.GetComponent<JoystickCheckInput>().dir.z);
+                X = Mathf.Lerp(-skill_3_MaxDistance, skill_3_MaxDistance, X_Percent);
+                Z = Mathf.Lerp(-skill_3_MaxDistance, skill_3_MaxDistance, Z_Percent);
+
+                skill_3_Pos = new Vector3(X, 0, Z) + skill_3_Canvas.transform.position;
+                Skill_3_UIActive(false);
+                player.ChangeState(new PlayerSkill_3_State());
+                player.isSkill_3_Casting = true;
+                isSkill_3_CoolDown = true;
+                skill_3_Image_Mobile.fillAmount = 1;
+                skill_3_CoolDownTime = skill_3_MaxCoolDown;
+                skill_3_TextCoolDown_Mobile.gameObject.SetActive(true);
+                skill_3_TextCoolDown_Mobile.text = skill_3_MaxCoolDown.ToString();
             }
         }
     }

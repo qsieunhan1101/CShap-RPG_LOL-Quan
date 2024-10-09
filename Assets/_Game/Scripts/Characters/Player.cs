@@ -5,8 +5,6 @@ using UnityEngine.UI;
 public class Player : Character
 {
     protected IState<Player> currentState;
-
-
     [SerializeField] private LayerMask groundLayerMask;
     [SerializeField] private LayerMask enemyLayerMask;
     [SerializeField] private Collider[] enemyColliders;
@@ -101,7 +99,6 @@ public class Player : Character
             ChangeState(new PlayerDeadState());
         }
 
-        MoveOrAttackByClick();
 
         if (currentState != null)
         {
@@ -114,6 +111,10 @@ public class Player : Character
 
             MoveByJoystick();
 
+        }
+        else
+        {
+            MoveOrAttackByClick();
         }
 
     }
@@ -210,7 +211,6 @@ public class Player : Character
         }
 
 
-        Debug.Log("Look " + playerUI.PositionSkill);
         ChangeAnim(Constant.ANIM_SKILL_1);
         skill_1_Particle.Play();
     }
@@ -262,10 +262,18 @@ public class Player : Character
     public void Skill_3_Cast()
     {
         StopMove();
-        SetRotation(playerUI.Skill_3_Pos);
+        //SetRotation(playerUI.Skill_3_Pos);
         ChangeAnim(Constant.ANIM_SKILL_3);
         GameObject particle = Instantiate(skill_3_ParticlePrefab);
-        particle.transform.position = playerUI.Skill_3_Pos;
+        SetRotation(playerUI.Skill_3_Pos);
+        if (isMobileMode == true)
+        {
+            particle.transform.position = playerUI.Skill_3_Pos;
+        }
+        else
+        {
+            particle.transform.position = playerUI.Skill_3_Pos;
+        }
 
     }
     /// <summary>
@@ -284,25 +292,8 @@ public class Player : Character
         isSkill_3_Casting = false;
     }
 
-    public void ChangeGameStateFail()
-    {
-        StartCoroutine(ChangeFailState());
-    }
-    private IEnumerator ChangeFailState()
-    {
-        yield return new WaitForSeconds(1.5f);
-        GameManager.Instance.ChangeState(GameState.Fail);
-    }
-    private void OpenCanvas2D()
-    {
-        canvas2d.gameObject.SetActive(true);
-    }
-    private void CloseCanvas2D()
-    {
-        canvas2d.gameObject.SetActive(false);
-    }
 
-    // Mobile Mode =====================================================
+    #region MobileMode++++++
 
     private void MoveByJoystick()
     {
@@ -361,11 +352,34 @@ public class Player : Character
 
         }
 
-        if (enemyTarget != null && isAttack == false)
+        if (enemyTarget != null && isAttack == false && CheckSkillCast() == false)
         {
             ChangeState(new PlayerAttackState());
             isAttack = true;
         }
+    }
+    public void ResetAttack()
+    {
+        isAttack = false;
+    }
+    #endregion
+    public void ChangeGameStateFail()
+    {
+        StartCoroutine(ChangeFailState());
+    }
+    private IEnumerator ChangeFailState()
+    {
+        yield return new WaitForSeconds(1.5f);
+        GameManager.Instance.ChangeState(GameState.Fail);
+    }
+
+    private void OpenCanvas2D()
+    {
+        canvas2d.gameObject.SetActive(true);
+    }
+    private void CloseCanvas2D()
+    {
+        canvas2d.gameObject.SetActive(false);
     }
     public bool CheckSkillCast()
     {
@@ -382,13 +396,5 @@ public class Player : Character
             return true;
         }
         return false;
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, skill_2_Radius);
-
-        Gizmos.DrawWireSphere(transform.position, nomalAttackMobileRadius);
     }
 }
